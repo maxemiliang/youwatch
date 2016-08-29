@@ -2,8 +2,6 @@
 
 const Hapi = require('hapi')
 const server = new Hapi.Server()
-const joi = require('joi')
-const boom = require('boom')
 const nes = require('nes')
 const views = require('./routes/index.js')
 const ws = require('./routes/socket.js')

@@ -1,4 +1,39 @@
 {{> base}}
 <div class="container">
-  <h1>Welcome to YouWatch</h1>
+  <h1>welcome to youwatch</h1>
+  <hr>
+  <br>
+  <div class="grid">
+    <div class="cell -4of12">
+      <form class="form grid-center" action="/room/create" method="POST">
+        <fieldset class="form-group">
+          <label for="username">username:</label>
+          <input id="username" name="username" type="text" placeholder="type your name..." class="form-control">
+        </fieldset>
+        <fieldset class="form-group">
+          <label for="room-name">room-name:</label>
+          <input id="room-name" name="roomname" type="text" placeholder="green-coala" class="form-control">
+        </fieldset>
+        <div class="form-actions">
+          <button type="submit" class="btn btn-success btn-block">create a room</button>
+        </div>
+      </form>
+    </div>
+    <div class="cell -1of12"></div>
+    <div class="cell -4of12">
+      <form class="form grid-center" action="/room/join" method="POST">
+        <fieldset class="form-group">
+          <label for="username">username:</label>
+          <input id="username" type="text" placeholder="type your name..." class="form-control">
+        </fieldset>
+        <fieldset class="form-group">
+          <label for="room-name2">room-name:</label>
+          <input id="room-name2" type="text" placeholder="green-coala" class="form-control">
+        </fieldset>
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary btn-block">join a room</button>
+        </div>
+      </form>
+    </div>
+  </div>
 </div>
