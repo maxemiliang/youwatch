@@ -1,0 +1,15 @@
+{
+  "name": "youwatch",
+  "version": "0.0.1",
+  "description": "Collaborative youtube player with requests for songs",
+  "main": "server.js",
+  "scripts": {
+    "test": "npm test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://git.maxemiliang.me/Maxemiliang/YouWatch.git"
+  },
+  "author": "maxemiliang contact@maxemiliang.me",
+  "license": "MIT"
+}
