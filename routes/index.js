@@ -21,7 +21,7 @@ module.exports = [
       validate: {
         payload: {
           username: Joi.string().alphanum().min(5).max(30).required(),
-          roomname: Joi.string().alphanum().min(5).max(10).required()
+          roomname: Joi.string().alphanum().min(5).max(15).required()
         }
       },
       handler: (request, reply) => {
@@ -52,19 +52,27 @@ module.exports = [
     config: {
       validate: {
         params: {
-          roomname: Joi.string().alphanum().min(5).max(10).required()
+          roomname: Joi.string().alphanum().min(5).max(15).required()
         }
       },
       handler: (request, reply) => {
-        db.find({roomname: request.params}, (err, room) => {
+        db.findOne({roomname: request.params.roomname}, (err, room) => {
           if (err) throw err
-          if (room[0] !== undefined) {
-            reply(room)
+          if (room !== null) {
+            reply.view('room', {roomname: room.roomname})
           } else {
             reply.redirect('/')
           }
         })
       }
+    }
+  },
+
+  {
+    method: 'POST',
+    path: '/room/join',
+    handler: (request, reply) => {
+      reply.redirect('/room/' + request.payload.roomname)
     }
   }
 ]

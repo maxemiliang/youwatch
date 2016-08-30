@@ -3,7 +3,7 @@ module.exports = [
     method: 'GET',
     path: '/ws/meme',
     config: {
-      id: 'meme',
+      id: 'link',
       handler: (request, reply) => {
         reply('hello')
       }
