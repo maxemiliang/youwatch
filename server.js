@@ -3,6 +3,8 @@
 const Hapi = require('hapi')
 const server = new Hapi.Server()
 const views = require('./routes/index.js')
+const DataStore = require('nedb')
+const db = new DataStore({ filename: './chat.db', autoload: true })
 
 server.connection({ port: 1337 })
 const io = require('socket.io')(server.listener)
@@ -10,12 +12,26 @@ const io = require('socket.io')(server.listener)
 let chat = io.of('/ws').on('connection', function (socket) {
   socket.on('join-room', (room) => {
     socket.join(room)
-    // chat.to(room).emit('users', { users: chat.sockets.adapter.rooms['my_room'].length })
-    console.dir(io.sockets.adapter.rooms)
+    socket.allRooms = room
+    // TODO
+    // db.findOne({ roomname: room }, (err, res) => {
+    //   if (err) throw err
+    //   if (res[0] !== undefined) {
+    //     db.update({roomname: room}, { users: res[0].users.push({}) }  
+          io.of('/ws').in(room).clients((err, clients) => {
+            if (err) throw err
+            chat.to(room).emit('users', clients.length)
+          })
+    //     })
+    //   }
+    // })
   })
 
   socket.on('disconnect', function () {
-    chat.emit('user disconnected')
+    io.of('/ws').in(socket.allRooms).clients((err, clients) => {
+      if (err) throw err
+      chat.to(socket.allRooms).emit('users', clients.length)
+    })
   })
 })
 
@@ -54,7 +70,7 @@ server.register(require('inert'), (err) => {
 
 server.register(require('vision'), (err) => {
   if (err) {
-      console.log('Failed to load vision.')
+    console.log('Failed to load vision.')
   }
 
   server.views({

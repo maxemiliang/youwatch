@@ -57,7 +57,7 @@
 	})
 
 	socket.on('users', (data) => {
-	  console.log(data)
+	  $('#users-online').text('users online: ' + data)
 	})
 
 

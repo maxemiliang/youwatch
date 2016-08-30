@@ -28,7 +28,7 @@ module.exports = [
         let room = {
           creator: request.payload.username,
           roomname: request.payload.roomname,
-          msgs: {},
+          users: [],
           links: []
         }
         db.find({roomname: request.payload.roomname}, (err, result) => {
