@@ -2,11 +2,22 @@
 
 const Hapi = require('hapi')
 const server = new Hapi.Server()
-const nes = require('nes')
 const views = require('./routes/index.js')
-const ws = require('./routes/socket.js')
 
 server.connection({ port: 1337 })
+const io = require('socket.io')(server.listener)
+
+let chat = io.of('/ws').on('connection', function (socket) {
+  socket.on('join-room', (room) => {
+    socket.join(room)
+    // chat.to(room).emit('users', { users: chat.sockets.adapter.rooms['my_room'].length })
+    console.dir(io.sockets.adapter.rooms)
+  })
+
+  socket.on('disconnect', function () {
+    chat.emit('user disconnected')
+  })
+})
 
 server.register(require('inert'), (err) => {
   if (err) {
