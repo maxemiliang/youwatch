@@ -55,14 +55,6 @@ server.register(require('vision'), (err) => {
   server.route(views)
 })
 
-server.register(nes, (err) => {
-  if (err) {
-    console.log('Failed to load nes.')
-  }
-
-  server.route(ws)
-})
-
 server.start((err) => {
   if (err) throw err
   console.log('Server running at:' + server.info.uri)
