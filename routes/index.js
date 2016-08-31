@@ -4,6 +4,9 @@ const Joi = require('joi')
 const Boom = require('boom')
 const DataStore = require('nedb')
 const db = new DataStore({ filename: './chat.db', autoload: true })
+const uuid = require('uuid')
+
+// Routes
 
 module.exports = [
   {
@@ -25,8 +28,10 @@ module.exports = [
         }
       },
       handler: (request, reply) => {
+        let hostuuid = uuid.v4()
         let room = {
           creator: request.payload.username,
+          host_uuid: hostuuid,
           roomname: request.payload.roomname,
           users: [],
           links: []
@@ -36,7 +41,7 @@ module.exports = [
           if (result[0] === undefined) {
             db.insert(room, (err, newRoom) => {
               if (err) throw err
-              reply.redirect('/room/' + request.payload.roomname)
+              reply.redirect('/room/' + request.payload.roomname).state('data', { uuid: hostuuid })
             })
           } else {
             reply.redirect('/')
