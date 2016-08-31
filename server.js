@@ -2,7 +2,7 @@
 
 /*
 
-  YouWatch: v0.0.4
+  YouWatch: v0.0.5
   creator: maxemiliang <contact@maxemiliang.me>
   install & run: 'npm install', 'npm start'
   runs by default on: 0.0.0.0:1337

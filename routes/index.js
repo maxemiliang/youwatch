@@ -65,7 +65,7 @@ module.exports = [
           roomname: Joi.string().alphanum().min(5).max(15).required()
         },
         failAction: (request, reply, source, error) => {
-          request.yar.flash('err', 'username must be min 5 characters and max 30 characters. roomname must be min 5 characters and max 15 characters')
+          request.yar.flash('err', 'username must be min 5 characters and max 30 characters. roomname must be min 5 characters and max 15 characters and must exist')
           reply.redirect('/')
         }
       },
@@ -98,7 +98,6 @@ module.exports = [
         }
       },
       handler: (request, reply) => {
-        // db.findOne({})
         reply.redirect('/room/' + request.payload.roomname)
       }
     }
