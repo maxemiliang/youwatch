@@ -75,7 +75,7 @@ module.exports = [
           if (room !== null) {
             reply.view('room', {roomname: room.roomname})
           } else {
-            request.yar.flash('err', 'Room not found')
+            request.yar.flash('err', 'Error Joining room')
             reply.redirect('/')
           }
         })
@@ -98,7 +98,29 @@ module.exports = [
         }
       },
       handler: (request, reply) => {
-        reply.redirect('/room/' + request.payload.roomname)
+        db.findOne({ roomname: request.payload.roomname }, (err, room) => {
+          if (err) throw err
+          if (room !== null) {
+            let found = room.users.some((el) => {
+              return el.name === request.payload.username
+            })
+            if (!found) {
+              let useruuid = uuid.v4()
+              db.update({ roomname: room.roomname }, { $push: { users: { name: request.payload.username, uuid: useruuid } } }, {}, (err, updated) => {
+                if (err) throw err
+                console.log(updated)
+                request.yar.set('uuid', { uuid: useruuid })
+                reply.redirect('/room/' + request.payload.roomname)
+              })
+            } else {
+              request.yar.flash('err', 'Username Taken')
+              reply.redirect('/')
+            }
+          } else {
+            request.yar.flash('err', 'Room not found')
+            reply.redirect('/')
+          }
+        })
       }
     }
   }
