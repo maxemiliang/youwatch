@@ -21,7 +21,7 @@ const io = require('socket.io')(server.listener)
 var options = {
   storeBlank: false,
   cookieOptions: {
-    password: 'oijdoawowadawoawidjawdjadjaodjawdjadjaodjsldjawiodjasdawiodjadj', // very secure please change me :P
+    password: 'oijdoawowadawoawidjawdjadjaodjawdjadjaodjsldjawiodjasdawiodjadj', // very secure, yes (In prod please change me!) :P
     isSecure: false,
     isHttpOnly: true
   }
