@@ -18,14 +18,19 @@ const db = new DataStore({ filename: './chat.db', autoload: true })
 server.connection({ port: 1337 })
 const io = require('socket.io')(server.listener)
 
+var options = {
+  storeBlank: false,
+  cookieOptions: {
+    password: 'oijdoawowadawoawidjawdjadjaodjawdjadjaodjsldjawiodjasdawiodjadj', // very secure please change me :P
+    isSecure: false,
+    isHttpOnly: true
+  }
+}
+
+
 // configure the server too use cookies
-server.state('data', {
-  ttl: null,
-  isSecure: true,
-  isHttpOnly: true,
-  encoding: 'base64json',
-  clearInvalid: false,
-  strictHeader: true
+server.register({ register: require('yar'), options: options }, (err) => { 
+  if (err) throw err
 })
 
 // create a socket handler at '/ws' namespace

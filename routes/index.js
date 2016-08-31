@@ -13,7 +13,7 @@ module.exports = [
     method: 'GET',
     path: '/',
     handler: (request, reply) => {
-      reply.view('index')
+      reply.view('index', { err: request.yar.flash('err') })
     }
   },
 
@@ -25,6 +25,10 @@ module.exports = [
         payload: {
           username: Joi.string().alphanum().min(5).max(30).required(),
           roomname: Joi.string().alphanum().min(5).max(15).required()
+        },
+        failAction: (request, reply, source, error) => {
+          request.yar.flash('err', 'username must be min 5 characters and max 30 characters. roomname must be min 5 characters and max 15 characters')
+          reply.redirect('/')
         }
       },
       handler: (request, reply) => {
@@ -41,7 +45,8 @@ module.exports = [
           if (result[0] === undefined) {
             db.insert(room, (err, newRoom) => {
               if (err) throw err
-              reply.redirect('/room/' + request.payload.roomname).state('data', { uuid: hostuuid })
+              request.yar.set('uuid', { uuid: hostuuid })
+              reply.redirect('/room/' + request.payload.roomname)
             })
           } else {
             reply.redirect('/')
@@ -58,6 +63,10 @@ module.exports = [
       validate: {
         params: {
           roomname: Joi.string().alphanum().min(5).max(15).required()
+        },
+        failAction: (request, reply, source, error) => {
+          request.yar.flash('err', 'username must be min 5 characters and max 30 characters. roomname must be min 5 characters and max 15 characters')
+          reply.redirect('/')
         }
       },
       handler: (request, reply) => {
@@ -66,6 +75,7 @@ module.exports = [
           if (room !== null) {
             reply.view('room', {roomname: room.roomname})
           } else {
+            request.yar.flash('err', 'Room not found')
             reply.redirect('/')
           }
         })
@@ -76,8 +86,21 @@ module.exports = [
   {
     method: 'POST',
     path: '/room/join',
-    handler: (request, reply) => {
-      reply.redirect('/room/' + request.payload.roomname)
+    config: {
+      validate: {
+        payload: {
+          username: Joi.string().alphanum().min(5).max(30).required(),
+          roomname: Joi.string().alphanum().min(5).max(15).required()
+        },
+        failAction: (request, reply, source, error) => {
+          request.yar.flash('err', 'username must be min 5 characters and max 30 characters. roomname must be min 5 characters and max 15 characters')
+          reply.redirect('/')
+        }
+      },
+      handler: (request, reply) => {
+        // db.findOne({})
+        reply.redirect('/room/' + request.payload.roomname)
+      }
     }
   }
 ]

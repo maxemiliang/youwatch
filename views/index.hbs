@@ -3,6 +3,7 @@
   <h1>welcome to youwatch</h1>
   <hr>
   <br>
+  {{#if err}}<div class="cell -12of12"><div class="alert alert-error">{{ err }}</div></div>{{/if}}
   <div class="grid">
     <div class="cell -4of12">
       <form class="form grid-center" action="/room/create" method="POST">

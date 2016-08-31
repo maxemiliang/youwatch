@@ -48,7 +48,7 @@
 
 	let $ = __webpack_require__(1)
 
-	let socket = io.connect('http://localhost:1337/ws')
+	let socket = io.connect('http://' + location.host + '/ws')
 
 	let room = window.location.pathname.split('/')[2]
 
