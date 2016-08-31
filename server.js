@@ -3,7 +3,7 @@
 /*
 
   YouWatch: v0.0.5
-  creator: maxemiliang <contact@maxemiliang.me>
+  creator and maintainer: maxemiliang <contact@maxemiliang.me>
   install & run: 'npm install', 'npm start'
   runs by default on: 0.0.0.0:1337
 
@@ -28,7 +28,7 @@ var options = {
 }
 
 
-// configure the server too use cookies
+// configure the server to use cookies
 server.register({ register: require('yar'), options: options }, (err) => { 
   if (err) throw err
 })
@@ -38,18 +38,10 @@ let chat = io.of('/ws').on('connection', function (socket) {
   socket.on('join-room', (room) => {
     socket.join(room)
     socket.allRooms = room
-    // TODO: might be a much cleaner way of adding users
-    // db.findOne({ roomname: room }, (err, res) => {
-    //   if (err) throw err
-    //   if (res[0] !== undefined) {
-    //     db.update({roomname: room}, { users: res[0].users.push({}) }
-          io.of('/ws').in(room).clients((err, clients) => {
-            if (err) throw err
-            chat.to(room).emit('users', clients.length)
-          })
-    //     })
-    //   }
-    // })
+    io.of('/ws').in(room).clients((err, clients) => {
+      if (err) throw err
+      chat.to(room).emit('users', clients.length)
+    })
   })
 
   socket.on('disconnect', function () {
