@@ -59,12 +59,12 @@ let chat = io.of('/ws').on('connection', function (socket) {
   socket.on('add:video', data => {
     db.findOne({ roomname: socket.room.toLowerCase() }, (err, room) => {
       if (err) throw err
+      let uuid_decoded = new Buffer(data.uuid, 'base64').toString().split(':')[1].slice(0, -1)
       let found = room.urls.some(el => {
         return el === data.video
       })
       let isUser = room.users.some(el => {
-        console.log(el.uuid + ', ' + data.uuid)
-        return el.uuid === data.uuid
+        return el.uuid === uuid_decoded
       })
       if (room === null || found || !isUser) {
         return false
