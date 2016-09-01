@@ -2,7 +2,7 @@
 
 /*
 
-  YouWatch: v0.1.0
+  YouWatch: v0.1.4
   creator and maintainer: maxemiliang <contact@maxemiliang.me>
   install & run: 'npm install', 'npm start'
   runs by default on: 0.0.0.0:1337
@@ -19,6 +19,7 @@ const yar = require('yar')
 server.connection({ port: 1337 })
 const io = require('socket.io')(server.listener)
 
+// for cookies sent between sockets
 server.state('data', {
   ttl: null,
   isSecure: false,
@@ -28,6 +29,7 @@ server.state('data', {
   strictHeader: false
 })
 
+// this is for the flash cookies mainly
 var options = {
   storeBlank: false,
   cookieOptions: {

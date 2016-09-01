@@ -45,7 +45,6 @@ module.exports = [
           if (result[0] === undefined) {
             db.insert(room, (err, newRoom) => {
               if (err) throw err
-              // request.yar.set('uuid', { uuid: hostuuid })
               reply.state('data', { uuid: hostuuid }).redirect('/room/' + request.payload.roomname)
             })
           } else {
@@ -108,7 +107,6 @@ module.exports = [
               let useruuid = uuid.v4()
               db.update({ roomname: room.roomname }, { $push: { users: { name: request.payload.username, uuid: useruuid } } }, {}, (err, updated) => {
                 if (err) throw err
-                // request.yar.set('uuid', { uuid: useruuid })
                 reply.redirect('/room/' + request.payload.roomname).state('data', { uuid: useruuid })
               })
             } else {
