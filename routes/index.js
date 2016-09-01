@@ -27,27 +27,28 @@ module.exports = [
           roomname: Joi.string().alphanum().min(5).max(15).required()
         },
         failAction: (request, reply, source, error) => {
-          request.yar.flash('err', 'username must be min 5 characters and max 30 characters. roomname must be min 5 characters and max 15 characters')
+          request.yar.flash('err', error.data.details[0].message)
           reply.redirect('/')
         }
       },
       handler: (request, reply) => {
         let hostuuid = uuid.v4()
         let room = {
-          creator: request.payload.username,
+          creator: request.payload.username.toLowerCase(),
           host_uuid: hostuuid,
-          roomname: request.payload.roomname,
+          roomname: request.payload.roomname.toLowerCase(),
           users: [],
-          links: []
+          urls: []
         }
-        db.find({roomname: request.payload.roomname}, (err, result) => {
+        db.find({roomname: request.payload.roomname.toLowerCase()}, (err, result) => {
           if (err) throw err
           if (result[0] === undefined) {
             db.insert(room, (err, newRoom) => {
               if (err) throw err
-              reply.state('data', { uuid: hostuuid }).redirect('/room/' + request.payload.roomname)
+              reply.redirect('/room/' + request.payload.roomname.toLowerCase()).state('data', { uuid: hostuuid })
             })
           } else {
+            request.yar.flash('err', 'roomname already taken!')
             reply.redirect('/')
           }
         })
@@ -64,15 +65,15 @@ module.exports = [
           roomname: Joi.string().alphanum().min(5).max(15).required()
         },
         failAction: (request, reply, source, error) => {
-          request.yar.flash('err', 'username must be min 5 characters and max 30 characters. roomname must be min 5 characters and max 15 characters and must exist')
+          request.yar.flash('err', error.data.details[0].message)
           reply.redirect('/')
         }
       },
       handler: (request, reply) => {
-        db.findOne({roomname: request.params.roomname}, (err, room) => {
+        db.findOne({ roomname: request.params.roomname.toLowerCase() }, (err, room) => {
           if (err) throw err
           if (room !== null) {
-            reply.view('room', {roomname: room.roomname})
+            reply.view('room', { roomname: room.roomname.toLowerCase() })
           } else {
             request.yar.flash('err', 'Error Joining room')
             reply.redirect('/')
@@ -92,22 +93,23 @@ module.exports = [
           roomname: Joi.string().alphanum().min(5).max(15).required()
         },
         failAction: (request, reply, source, error) => {
-          request.yar.flash('err', 'username must be min 5 characters and max 30 characters. roomname must be min 5 characters and max 15 characters')
+          request.yar.flash('err', error.data.details[0].message)
           reply.redirect('/')
         }
       },
       handler: (request, reply) => {
-        db.findOne({ roomname: request.payload.roomname }, (err, room) => {
+        db.findOne({ roomname: request.payload.roomname.toLowerCase() }, (err, room) => {
           if (err) throw err
           if (room !== null) {
-            let found = room.users.some((el) => {
-              return el.name === request.payload.username
+            let found = room.users.some(el => {
+              return el.name === request.payload.username.toLowerCase()
             })
-            if (!found) {
+            let host_check = (request.payload.username === room.creator)
+            if (!found && !host_check) {
               let useruuid = uuid.v4()
-              db.update({ roomname: room.roomname }, { $push: { users: { name: request.payload.username, uuid: useruuid } } }, {}, (err, updated) => {
+              db.update({ roomname: room.roomname.toLowerCase() }, { $push: { users: { name: request.payload.username.toLowerCase(), uuid: useruuid } } }, {}, (err, updated) => {
                 if (err) throw err
-                reply.redirect('/room/' + request.payload.roomname).state('data', { uuid: useruuid })
+                reply.redirect('/room/' + request.payload.roomname.toLowerCase()).state('data', { uuid: useruuid })
               })
             } else {
               request.yar.flash('err', 'Username Taken')

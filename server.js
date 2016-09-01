@@ -49,6 +49,7 @@ server.register({ register: yar, options: options }, (err) => {
 let chat = io.of('/ws').on('connection', function (socket) {
   socket.on('join-room', data => {
     socket.join(data.roomname)
+    socket.room = data.roomname
     io.of('/ws').in(data.roomname).clients((err, clients) => {
       if (err) throw err
       chat.to(data.roomname).emit('users', clients.length)
@@ -56,13 +57,35 @@ let chat = io.of('/ws').on('connection', function (socket) {
   })
 
   socket.on('add:video', data => {
-    console.log(data)
+    db.findOne({ roomname: socket.room.toLowerCase() }, (err, room) => {
+      if (err) throw err
+      let found = room.urls.some(el => {
+        return el === data.video
+      })
+      let isUser = room.users.some(el => {
+        console.log(el.uuid + ', ' + data.uuid)
+        return el.uuid === data.uuid
+      })
+      if (room === null || found || !isUser) {
+        return false
+      }
+      db.update({ roomname: room.roomname }, { $push: { urls: data.video } }, {}, (err, updated) => {
+        if (err) throw err
+        if (updated === 1) {
+          socket.emit('add:success')
+        } else {
+          socket.emit('add:error')
+        }
+      })
+    })
   })
 
   socket.on('disconnect', function () {
-    io.of('/ws.uuid').in(socket.allRooms).clients((err, clients) => {
+    io.of('/ws').in(socket.room).clients((err, clients) => {
       if (err) throw err
-      chat.to(socket.allRooms).emit('users', clients.length)
+      console.log(clients)
+      console.log(socket.room)
+      chat.to(socket.room).emit('users', clients.length)
     })
   })
 })
