@@ -2,7 +2,7 @@
 
 /*
 
-  YouWatch: v0.0.5
+  YouWatch: v0.1.0
   creator and maintainer: maxemiliang <contact@maxemiliang.me>
   install & run: 'npm install', 'npm start'
   runs by default on: 0.0.0.0:1337
@@ -14,38 +14,51 @@ const server = new Hapi.Server()
 const views = require('./routes/index.js')
 const DataStore = require('nedb')
 const db = new DataStore({ filename: './chat.db', autoload: true })
+const yar = require('yar')
 
 server.connection({ port: 1337 })
 const io = require('socket.io')(server.listener)
+
+server.state('data', {
+  ttl: null,
+  isSecure: false,
+  isHttpOnly: false,
+  encoding: 'base64json',
+  clearInvalid: false,
+  strictHeader: false
+})
 
 var options = {
   storeBlank: false,
   cookieOptions: {
     password: 'this-is-a-really-secure-password-yes-i-agree-hope-its-long-enough', // very secure, yes (In prod please change me!) :P
     isSecure: false,
-    isHttpOnly: true
+    isHttpOnly: false
   }
 }
 
 
 // configure the server to use cookies
-server.register({ register: require('yar'), options: options }, (err) => { 
+server.register({ register: yar, options: options }, (err) => { 
   if (err) throw err
 })
 
 // create a socket handler at '/ws' namespace
 let chat = io.of('/ws').on('connection', function (socket) {
-  socket.on('join-room', (room) => {
-    socket.join(room)
-    socket.allRooms = room
-    io.of('/ws').in(room).clients((err, clients) => {
+  socket.on('join-room', data => {
+    socket.join(data.roomname)
+    io.of('/ws').in(data.roomname).clients((err, clients) => {
       if (err) throw err
-      chat.to(room).emit('users', clients.length)
+      chat.to(data.roomname).emit('users', clients.length)
     })
   })
 
+  socket.on('add:video', data => {
+    console.log(data)
+  })
+
   socket.on('disconnect', function () {
-    io.of('/ws').in(socket.allRooms).clients((err, clients) => {
+    io.of('/ws.uuid').in(socket.allRooms).clients((err, clients) => {
       if (err) throw err
       chat.to(socket.allRooms).emit('users', clients.length)
     })
