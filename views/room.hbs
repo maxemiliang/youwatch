@@ -6,7 +6,9 @@
   <br>
   <div class="grid">
     <div class="cell -7of12">
-      <iframe height="300px" width="100%" src="https://www.youtube.com/embed/mj-v6zCnEaw" frameborder="0"></iframe>
+      <!--<iframe id="yt_player" enablejsapi="true" height="300px" width="100%" src="https://www.youtube.com/embed/M7lc1UVf-VE?enablejsapi=1"
+      frameborder="0"></iframe>-->
+      <div id="player"></div>
     </div>
     <div class="cell chat -5of12">
       chat here
@@ -24,3 +26,11 @@
   <div class="grid error-grid">
   </div>
 </div>
+<script>
+  var tag = document.createElement('script')
+  tag.id = 'iframeYT'
+  tag.src = 'https://www.youtube.com/iframe_api'
+  var firstScriptTag = document.getElementsByTagName('script')[0]
+  firstScriptTag.parentNode.insertBefore(tag, firstScriptTag)
+</script>
+

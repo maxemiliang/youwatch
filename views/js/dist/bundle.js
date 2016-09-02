@@ -62,6 +62,18 @@
 	  $('#users-online').text('users online: ' + data)
 	})
 
+	socket.on('add:error', () => {
+	  $('.error-grid').append('<br><div class="cell -12of12 error-url"><div class="alert alert-error">youtube video already in queue</div>').children().fadeOut(5000, () => {
+	    $('.error-grid').children().remove()
+	  })
+	})
+
+	socket.on('add:success', () => {
+	  $('.error-grid').append('<br><div class="cell -12of12 error-url"><div class="alert alert-success">youtube video added to queue</div>').children().fadeOut(5000, () => {
+	    $('.error-grid').children().remove()
+	  })
+	})
+
 	$('.send').on('click', () => {
 	  let url = $('.url-input').val()
 	  if (url !== undefined || url !== '') {
@@ -77,6 +89,29 @@
 	    }
 	  }
 	})
+
+	let player
+
+	function onYouTubeIframeAPIReady () {
+	  console.log('meme')
+	  player = new YT.Player('player', {
+	    height: '390',
+	    width: '640',
+	    videoId: 'M7lc1UVf-VE',
+	    events: {
+	      'onReady': onPlayerReady,
+	      'onStateChange': onPlayerStateChange
+	    }
+	  })
+	}
+
+	function onPlayerReady (event) {
+	  console.log('yeet1')
+	}
+
+	function onPlayerStateChange (event) {
+	  console.log('yeet2')
+	}
 
 
 /***/ },

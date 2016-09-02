@@ -59,14 +59,17 @@ let chat = io.of('/ws').on('connection', function (socket) {
   socket.on('add:video', data => {
     db.findOne({ roomname: socket.room.toLowerCase() }, (err, room) => {
       if (err) throw err
-      let uuid_decoded = new Buffer(data.uuid, 'base64').toString().split(':')[1].slice(0, -1)
+      // let uuid_decoded = new Buffer(data.uuid, 'base64').toString().split(':')[1].slice(0, -1)
       let found = room.urls.some(el => {
         return el === data.video
       })
-      let isUser = room.users.some(el => {
-        return el.uuid === uuid_decoded
-      })
-      if (room === null || found || !isUser) {
+      // TODO: make this work
+      // let isUser = room.users.some(el => {
+      //   console.log(el.uuid + ' = ' + uuid_decoded)
+      //   return el.uuid === uuid_decoded
+      // })
+      if (room === null || found) {
+        socket.emit('add:error')
         return false
       }
       db.update({ roomname: room.roomname }, { $push: { urls: data.video } }, {}, (err, updated) => {
@@ -83,8 +86,6 @@ let chat = io.of('/ws').on('connection', function (socket) {
   socket.on('disconnect', function () {
     io.of('/ws').in(socket.room).clients((err, clients) => {
       if (err) throw err
-      console.log(clients)
-      console.log(socket.room)
       chat.to(socket.room).emit('users', clients.length)
     })
   })
