@@ -39,6 +39,9 @@ var options = {
   }
 }
 
+let decode = (base64) => {
+  return Buffer(base64, 'base64').toString('ascii')
+}
 
 // configure the server to use cookies
 server.register({ register: yar, options: options }, (err) => { 
@@ -72,7 +75,7 @@ let chat = io.of('/ws').on('connection', function (socket) {
         socket.emit('add:error')
         return false
       }
-      db.update({ roomname: room.roomname }, { $push: { urls: data.video } }, {}, (err, updated) => {
+      db.update({ roomname: room.roomname.toLowerCase() }, { $push: { urls: data.video } }, {}, (err, updated) => {
         if (err) throw err
         if (updated === 1) {
           socket.emit('add:success')
@@ -80,6 +83,17 @@ let chat = io.of('/ws').on('connection', function (socket) {
           socket.emit('add:error')
         }
       })
+    })
+  })
+
+  socket.on('video:paused', (data) => {
+    let uuid = decode(data.uuid)
+    db.findOne({ roomname: data.roomname.toLowerCase() }, (err, room) => {
+      if (err) throw err
+      if (room === null) return false
+      if (room.host_uuid === uuid.split('"')[3]) {
+        socket.broadcast.to(data.roomname)
+      }
     })
   })
 

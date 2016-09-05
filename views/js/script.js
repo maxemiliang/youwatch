@@ -54,10 +54,25 @@ let player = YouTubePlayer('player', {
     videoId: '_Z1Krfww5eE'
 })
 
-function onPlayerReady (event) {
-  console.log('yeet1')
-}
+player.on('stateChange', (e) => {
+  if (e.data === 0) { // ended
+    socket.emit('video:ended', { roomname: room, uuid: id })
+  } else if (e.data === 1) { // playing
+    socket.emit('video:playing', { roomname: room, uuid: id })
+  } else if (e.data === 2) { // paused
+    socket.emit('video:paused', { roomname: room, uuid: id })
+  }
+})
 
-function onPlayerStateChange (event) {
-  console.log('yeet2')
-}
+
+socket.on('video:pause', () => {
+  console.log('meme')
+  player.pauseVideo()
+        .then(() => {
+          console.log('paused')
+        })
+})
+
+socket.on('video:change', (data) => {
+  // todo
+})
