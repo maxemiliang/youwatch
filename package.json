@@ -25,6 +25,7 @@
     "socket.io-client": "^1.4.8",
     "uuid": "^2.0.2",
     "vision": "^4.1.0",
-    "yar": "^7.0.2"
+    "yar": "^7.0.2",
+    "youtube-player": "^3.0.4"
   }
 }

@@ -1,5 +1,7 @@
 'use strict'
 
+let YouTubePlayer = require('youtube-player')
+
 let $ = require('jquery')
 
 let socket = io.connect('http://' + location.host + '/ws')
@@ -44,22 +46,13 @@ $('.send').on('click', () => {
   }
 })
 
-let player
 
 // TODO: Fix youtube player
-
-function onYouTubeIframeAPIReady () {
-  console.log('meme')
-  player = new YT.Player('player', {
+let player = YouTubePlayer('player', {
     height: '390',
-    width: '640',
-    videoId: 'M7lc1UVf-VE',
-    events: {
-      'onReady': onPlayerReady,
-      'onStateChange': onPlayerStateChange
-    }
-  })
-}
+    width: '100%',
+    videoId: '_Z1Krfww5eE'
+})
 
 function onPlayerReady (event) {
   console.log('yeet1')
