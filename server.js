@@ -92,7 +92,7 @@ let chat = io.of('/ws').on('connection', function (socket) {
       if (err) throw err
       if (room === null) return false
       if (room.host_uuid === uuid.split('"')[3]) {
-        socket.broadcast.to(data.roomname)
+        io.to(data.roomname).emit('video:pause')
       }
     })
   })
