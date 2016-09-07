@@ -44,7 +44,7 @@ let decode = (base64) => {
 }
 
 // configure the server to use cookies
-server.register({ register: yar, options: options }, (err) => { 
+server.register({ register: yar, options: options }, (err) => {
   if (err) throw err
 })
 
