@@ -60,8 +60,13 @@ let chat = io.of('/ws').on('connection', function (socket) {
   })
 
   socket.on('add:video', data => {
-    db.findOne({ roomname: socket.room.toLowerCase() }, (err, room) => {
+    db.findOne({ roomname: data.roomname }, (err, room) => {
       if (err) throw err
+      if (room === null) {
+        socket.emit('add:error')
+        console.log(room)
+        return
+      }
       console.log(room)
       // let uuid_decoded = new Buffer(data.uuid, 'base64').toString().split(':')[1].slice(0, -1)
       let found = room.urls.some(el => {
@@ -93,7 +98,7 @@ let chat = io.of('/ws').on('connection', function (socket) {
       if (err) throw err
       if (room === null) return false
       if (room.host_uuid === uuid.split('"')[3]) {
-        chat.to(data.roomname.toLowerCase()).emit('video:pause')
+        chat.to(data.roomname.toLowerCase()).emit('video:pause', data.time)
       }
     })
   })
@@ -105,7 +110,7 @@ let chat = io.of('/ws').on('connection', function (socket) {
       if (err) throw err
       if (room === null) return false
       if (room.host_uuid === uuid.split('"')[3]) {
-        chat.to(data.roomname.toLowerCase()).emit('video:play')
+        chat.to(data.roomname.toLowerCase()).emit('video:play', data.time)
       }
     })
   })
@@ -116,7 +121,13 @@ let chat = io.of('/ws').on('connection', function (socket) {
       if (err) throw err
       if (room === null) return false
       if (room.host_uuid === uuid.split('"')[3]) {
-        chat.to(data.roomname.toLowerCase()).emit('video:change', room.urls)
+        let newUrls = room.urls.splice(0, 1)
+        console.log(newUrls)
+        db.update({ roomname: data.roomname.toLowerCase() }, { $set: { urls: newUrls } }, {}, (err, updated) => {
+          if (err) throw err
+          db.findOne({ roomname: data.roomname.toLowerCase() })
+          chat.to(data.roomname.toLowerCase()).emit('video:change')
+        })
       }
     })
   })

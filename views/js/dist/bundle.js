@@ -80,8 +80,8 @@
 	  let url = $('.url-input').val()
 	  if (url !== undefined || url !== '') {
 	    var regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=|\?v=)([^#\&\?]*).*/;
-	    var match = url.match(regExp);
-	    if (match && match[2].length == 11) {
+	    var match = url.match(regExp)
+	    if (match && match[2].length === 11) {
 	      socket.emit('add:video', { roomname: room, uuid: id, video: url })
 	      $('.url-input').val('')
 	    } else {
@@ -101,30 +101,31 @@
 	})
 
 	player.on('stateChange', (e) => {
+	  let currentTime = e.target.getCurrentTime()
 	  if (e.data === 0) { // ended
 	    socket.emit('video:ended', { roomname: room, uuid: id })
 	  } else if (e.data === 1) { // playing
-	    socket.emit('video:playing', { roomname: room, uuid: id })
+	    socket.emit('video:playing', { roomname: room, uuid: id, time: currentTime })
 	  } else if (e.data === 2) { // paused
-	    socket.emit('video:paused', { roomname: room, uuid: id })
+	    socket.emit('video:paused', { roomname: room, uuid: id, time: currentTime })
 	  }
 	})
 
 
-	socket.on('video:pause', () => {
-	  player.pauseVideo().then(() => {
-	    // paused
+	socket.on('video:pause', time => {
+	  player.pauseVideo().then((e) => {
+	    e.seekTo(time, true)
 	  })
 	})
 
-	socket.on('video:play', () => {
-	  player.playVideo().then(() => {
-	    // play
+	socket.on('video:play', time => {
+	  player.playVideo().then((e) => {
+	    // playing
 	  })
 	})
 
 	socket.on('video:change', (data) => {
-	  // todo
+	  console.log(data)
 	})
 
 
