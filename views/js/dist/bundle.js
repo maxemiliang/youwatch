@@ -112,11 +112,15 @@
 
 
 	socket.on('video:pause', () => {
-	  console.log('meme')
-	  player.pauseVideo()
-	        .then(() => {
-	          console.log('paused')
-	        })
+	  player.pauseVideo().then(() => {
+	    // paused
+	  })
+	})
+
+	socket.on('video:play', () => {
+	  player.playVideo().then(() => {
+	    // play
+	  })
 	})
 
 	socket.on('video:change', (data) => {
