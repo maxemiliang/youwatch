@@ -40,7 +40,7 @@ var options = {
 }
 
 let decode = (base64) => {
-  return Buffer(base64, 'base64').toString('ascii')
+  return new Buffer(base64, 'base64').toString('ascii')
 }
 
 // configure the server to use cookies
