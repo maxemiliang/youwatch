@@ -53,9 +53,18 @@ let chat = io.of('/ws').on('connection', function (socket) {
   socket.on('join-room', data => {
     socket.join(data.roomname)
     socket.room = data.roomname
+    db.findOne({ roomname: data.roomname }, (err, data) => {
+      if (err) throw err
+      if (data.urls.length > 0) {
+        io.of('/ws').to(socket.id).emit('video:change', {urls: data.urls[0]})
+      } else {
+        io.of('/ws').to(socket.id).emit('queue:empty')
+      }
+    });
     io.of('/ws').in(data.roomname).clients((err, clients) => {
       if (err) throw err
       chat.to(data.roomname).emit('users', clients.length)
+
     })
   })
 
@@ -64,7 +73,7 @@ let chat = io.of('/ws').on('connection', function (socket) {
       if (err) throw err
       if (room === null) {
         socket.emit('add:error')
-        console.log(room)
+        console.log('room is null')
         return
       }
       console.log(room)
@@ -77,9 +86,21 @@ let chat = io.of('/ws').on('connection', function (socket) {
       //   console.log(el.uuid + ' = ' + uuid_decoded)
       //   return el.uuid === uuid_decoded
       // })
-      if (room === null || found) {
-        socket.emit('add:error')
+      if (found) {
+        socket.emit('add:inque')
         return false
+      }
+      if (room.urls.length === 0) {
+        db.update({ roomname: room.roomname.toLowerCase() }, { $push: { urls: data.video } }, {}, (err, updated) => {
+          if (err) throw err
+          if (updated === 1) {
+            socket.emit('add:success')
+            console.log('queue empty emitting new video to all clients')
+            socket.emit('video:change', { urls: data.video })
+          } else {
+            socket.emit('add:error')
+          }
+        })
       }
       db.update({ roomname: room.roomname.toLowerCase() }, { $push: { urls: data.video } }, {}, (err, updated) => {
         if (err) throw err
@@ -94,10 +115,12 @@ let chat = io.of('/ws').on('connection', function (socket) {
 
   socket.on('video:paused', (data) => {
     let uuid = decode(data.uuid)
+    console.log("pause event",uuid.split('"')[3])
     db.findOne({ roomname: data.roomname.toLowerCase() }, (err, room) => {
       if (err) throw err
       if (room === null) return false
       if (room.host_uuid === uuid.split('"')[3]) {
+        console.log("sending pause event")
         chat.to(data.roomname.toLowerCase()).emit('video:pause', data.time)
       }
     })
@@ -106,10 +129,12 @@ let chat = io.of('/ws').on('connection', function (socket) {
 
   socket.on('video:playing', (data) => {
     let uuid = decode(data.uuid)
+    console.log("play event",uuid.split('"')[3])
     db.findOne({ roomname: data.roomname.toLowerCase() }, (err, room) => {
       if (err) throw err
       if (room === null) return false
       if (room.host_uuid === uuid.split('"')[3]) {
+        console.log("sending play event")
         chat.to(data.roomname.toLowerCase()).emit('video:play', data.time)
       }
     })
@@ -117,16 +142,29 @@ let chat = io.of('/ws').on('connection', function (socket) {
 
   socket.on('video:ended', (data) => {
     let uuid = decode(data.uuid)
+    console.log("end event",uuid.split('"')[3])
     db.findOne({ roomname: data.roomname.toLowerCase() }, (err, room) => {
       if (err) throw err
       if (room === null) return false
       if (room.host_uuid === uuid.split('"')[3]) {
-        let newUrls = room.urls.splice(0, 1)
-        console.log(newUrls)
+        let oldUrls = room.urls
+        if (oldUrls.length > 1) {
+          oldUrls.shift()
+          let newUrls = oldUrls
+          console.log(newUrls)
+        }
+        let newUrls = oldUrls
         db.update({ roomname: data.roomname.toLowerCase() }, { $set: { urls: newUrls } }, {}, (err, updated) => {
           if (err) throw err
-          db.findOne({ roomname: data.roomname.toLowerCase() })
-          chat.to(data.roomname.toLowerCase()).emit('video:change')
+          db.findOne({ roomname: data.roomname.toLowerCase() }, (err, data) => {
+            if (err) throw err
+            if (data.urls.length > 0) {
+              chat.to(data.roomname.toLowerCase()).emit('video:change', { urls: data.urls[0] })
+            } else {
+              chat.to(data.roomname.toLowerCase()).emit('queue:empty')
+            }
+          })
+          console.log("sending end event event")
         })
       }
     })

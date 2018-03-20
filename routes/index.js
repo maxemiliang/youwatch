@@ -38,7 +38,7 @@ module.exports = [
           host_uuid: hostuuid,
           roomname: request.payload.roomname.toLowerCase(),
           users: [],
-          urls: ['https://youtu.be/_Z1Krfww5eE']
+          urls: []
         }
         db.find({roomname: request.payload.roomname.toLowerCase()}, (err, result) => {
           if (err) throw err
