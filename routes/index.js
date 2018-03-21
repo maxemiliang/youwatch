@@ -2,7 +2,8 @@
 
 const Joi = require('joi')
 const Boom = require('boom')
-const db = require('./../server.js')
+const DataStore = require('nedb')
+const db = new DataStore({ filename: './../chat.json', autoload: true })
 const uuid = require('uuid')
 
 // Routes
