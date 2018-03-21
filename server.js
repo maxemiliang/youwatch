@@ -13,7 +13,7 @@ const Hapi = require('hapi')
 const server = new Hapi.Server()
 const views = require('./routes/index.js')
 const DataStore = require('nedb')
-const db = new DataStore({ filename: './chat.db', autoload: true })
+const db = new DataStore({ filename: './chat.json', autoload: true })
 const yar = require('yar')
 
 server.connection({ port: 1337 })
