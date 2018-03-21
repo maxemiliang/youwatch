@@ -2,9 +2,9 @@
 
 /*
 
-  YouWatch: v0.1.4
+  YouWatch: v0.2.4
   creator and maintainer: maxemiliang <contact@maxemiliang.me>
-  install & run: 'npm install', 'npm start'
+  install & run: 'yarn install', 'yarn start'
   runs by default on: 0.0.0.0:1337
 
 */
@@ -232,3 +232,6 @@ server.start((err) => {
   if (err) throw err
   console.log('Server running at:' + server.info.uri)
 })
+
+exports.defaults = db;
+
