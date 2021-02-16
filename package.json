@@ -15,7 +15,7 @@
   "dependencies": {
     "boom": "^4.0.0",
     "hack": "^0.7.5",
-    "handlebars": "^4.0.5",
+    "handlebars": "^4.7.7",
     "hapi": "^15.0.2",
     "inert": "^4.0.2",
     "joi": "^9.0.4",
